@@ -13,8 +13,8 @@
 1. Склонируйте из GIT систему в каталог.
 
 2. Скопируйте и при необходимости скорректируйте файлы:
-    console/console.default.php
-    www/index_default.php
+    modules/core/console/console.default.php в console/console.php
+    www/index_default.php в www/index.php
 удалив "default" на конце.
 
 3. Установите рутовую папку для данного домена на папку "www"
