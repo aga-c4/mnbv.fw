@@ -5,8 +5,8 @@
 /tmp/
 /user/
 /vendor/
-/www/data/
-/www/tmp/
-/www/index.php
+/www/
+/composer.json
+
 
 
