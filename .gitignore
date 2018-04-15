@@ -1,0 +1,12 @@
+.idea
+/nbproject
+/console/
+/data/
+/tmp/
+/user/
+/vendor/
+/www/data/
+/www/tmp/
+/www/index.php
+
+
