@@ -14,7 +14,7 @@
 class SysBF {
 
     /**
-     * Посылает запрос к АПИ ExpertSender и возвращает ответ
+     * Посылает запрос по HTTP через CURL ExpertSender и возвращает ответ
      * @param array $param
      * @return mixed|string
      */
@@ -147,8 +147,7 @@ class SysBF {
      */
     public static function getmicrotime()
     {
-        list($usec, $sec) = explode(" ", microtime());
-        return ((float)$usec + (float)$sec);
+        return microtime(true);
     }
 	
     /**
@@ -186,7 +185,8 @@ class SysBF {
     }
 
     /**
-     * Преобразование строки в JSON в массив
+     * Преобразование строки в JSON в массив. Отличие от обычной функции - всегда возвращается массив, если неудачный
+     * вызов, то массив возвратится пустым.
      * @param $arrStr - строка в JSON
      * @return array - массив
      */
@@ -372,8 +372,8 @@ class SysBF {
         return iconv("UTF-8","CP1251", $str);
     }
 
-        /**
-     * Записывает в лог общую статистику использования баз данных
+    /**
+     * Записывает в лог общую статистику выполнения скрипта и использования баз данных
      * @param $view true - выводить лог независимо от установки константы APP_DEBUG_MODE
      */
     public static function putFinStatToLog($view=false){
