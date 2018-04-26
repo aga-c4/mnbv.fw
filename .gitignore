@@ -1,12 +1,13 @@
 .idea
 /nbproject
 /console/
-/data/
 /tmp/
 /user/
+/data/storage_files/
+/data/storages/
+/data/storage_dumps/migration.php
+/data/storage_dumps/*-status.csv
+/data/storage_dumps/dump/
 /vendor/
 /www/
 /composer.json
-
-
-
