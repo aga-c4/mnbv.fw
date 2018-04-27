@@ -11,3 +11,4 @@
 /vendor/
 /www/
 /composer.json
+/composer.lock
