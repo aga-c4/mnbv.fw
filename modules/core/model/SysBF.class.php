@@ -14,7 +14,7 @@
 class SysBF {
 
     /**
-     * Посылает запрос по HTTP с помощью CURL ExpertSender и возвращает ответ
+     * Посылает запрос по HTTP с помощью CURL и возвращает ответ
      * @param array $param
      * @return mixed|string
      */
