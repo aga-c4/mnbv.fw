@@ -14,7 +14,7 @@
 class SysBF {
 
     /**
-     * Посылает запрос по HTTP через CURL ExpertSender и возвращает ответ
+     * Посылает запрос по HTTP с помощью CURL ExpertSender и возвращает ответ
      * @param array $param
      * @return mixed|string
      */
@@ -88,7 +88,7 @@ class SysBF {
         $res = $str;
 
         if($type=='int') $res = intval($res); //Целое значение или дробное с точкой
-        elseif($type=='decimal') $res = preg_replace("/[^0-9\.,\-]/","",$res); //Целое значение или дробное с точкой, TODO - возможно доработать - всегда заменять запятую на точку или наоборот
+        elseif($type=='decimal') {$res = preg_replace("/[^0-9\.,\-]/","",$res);$res = str_replace(',','.',$res);} //Целое значение или дробное с точкой, TODO - возможно доработать - всегда заменять запятую на точку или наоборот
         elseif($type=='datetime') $res = preg_replace("/[^0-9\.,:\/\- ]/","",$res); //Проверка 0000-00-00 00:00:00
         elseif($type=='strictstr') $res = preg_replace("/[^0-9a-zA-Z_\-]/","",strtolower($res)); //Проверка только символы, цифры, дефис и нижнее подчеркивание с переводом в нижний регистр
         elseif($type=='minstr') $res = preg_replace("/[^0-9a-zA-Z_\-]/","",$res); //Проверка только символы, цифры, дефис и нижнее подчеркивание с переводом в нижний регистр
@@ -147,7 +147,8 @@ class SysBF {
      */
     public static function getmicrotime()
     {
-        return microtime(true);
+        list($usec, $sec) = explode(" ", microtime());
+        return ((float)$usec + (float)$sec);
     }
 	
     /**
@@ -176,17 +177,27 @@ class SysBF {
      * @param array $arr массив
      * @param string $key ключ
      * @param string $defval дефолтовое значение
+     * @param string $update варианты модификации результата (intval|floatval|strval|trim|strtolower|)
      * @return mixed Значение
      */
-    public static function getFrArr($arr,$key,$defval=null){
-        if (!is_array($arr)) return $defval;
-        if (!isset($arr[$key])) return $defval;
-        return $arr[$key];
+    public static function getFrArr($arr,$key,$defval=null,$update=''){
+        
+        if (!is_array($arr)) $result = $defval;
+        elseif (!isset($arr[$key])) $result = $defval;
+        else $result = $arr[$key];
+        
+            if ($update==='intval') $result = intval($result);
+        elseif ($update==='floatval') $result = floatval($result);
+        elseif ($update==='strval') $result = strval($result);
+        elseif ($update==='trim') $result = trim($result);
+        elseif ($update==='strtolower') $result = strtolower($result);
+        elseif ($update==='strtoupper') $result = strtoupper($result);
+            
+        return $result;
     }
 
     /**
-     * Преобразование строки в JSON в массив. Отличие от обычной функции - всегда возвращается массив, если неудачный
-     * вызов, то массив возвратится пустым.
+     * Преобразование строки в JSON в массив
      * @param $arrStr - строка в JSON
      * @return array - массив
      */
@@ -373,16 +384,16 @@ class SysBF {
     }
 
     /**
-     * Записывает в лог общую статистику выполнения скрипта и использования баз данных
+     * Записывает в лог общую статистику использования баз данных
      * @param $view true - выводить лог независимо от установки константы APP_DEBUG_MODE
      */
     public static function putFinStatToLog($view=false){
 
         if (SysLogs::$logComplete) return; //Разрешено отработать этому только 1 раз.
-        
+
         $oldLogView = SysLogs::$logView;
         SysLogs::$logView = true;
-        
+
         //Запишем в лог основные параметры работы текущего процесса
         $script_datetime_stop = date("Y-m-d G:i:s");
         $script_time_stop = SysBF::getmicrotime();
@@ -396,29 +407,10 @@ class SysBF {
         SysLogs::addLog("Runtime: $time_script".'s.');
         SysLogs::addLog("Memory peak usage: $memory_peak_usage");
         SysLogs::addLog("Memory fin usage: $memory_fin_usage");
-        
-        if ((defined('APP_DEBUG_MODE') && APP_DEBUG_MODE) || $view) { //Если это ражим отладки Добавим статистику по базам данных
 
-            //Статистика запросов MySQL---
-            $mysqlStat = DbMysql::mysqlStat();
-            SysLogs::addLog("\n---MySQL statistic: ---");
-            foreach ($mysqlStat as $key=>$value){
-                if (is_array($value)){
-                    $counter=1;
-                    foreach ($value as $mysqlQu) {
-                        SysLogs::addLog("Query$counter: ".str_replace("\n",' ',$mysqlQu));
-                        $counter++;
-                    }
-                }else{
-                    SysLogs::addLog("$key: ".$value);
-                }
-            }
-            
-            SysLogs::$logComplete = true;
-        } 
-        
+        SysLogs::$logComplete = true;
         SysLogs::$logView = $oldLogView;
-        
+
     }
 	
 }
