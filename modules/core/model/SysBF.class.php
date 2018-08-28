@@ -23,6 +23,7 @@ class SysBF {
      * - header (array типа array('Sign: 123', 'Key: dssdsd',...),
      * - proxy (array типа array('host'=>'145.239.92.106:3128','passwd'=>'test:test')),
      * - fileto дескриптор файла передачи результат, если надо,
+     * - timeout максимальное время выполнения в секундах, если 0 или не задано, то нет ограничения
      * @return mixed
      * https://php.ru/manual/function.curl-setopt.html
      */
@@ -42,14 +43,16 @@ class SysBF {
         $userAgent = (isset($params['useragent']))?$params['useragent']:'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)';
         if ($userAgent != '') curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
         if (isset($params['refer'])) curl_setopt($ch, CURLOPT_REFERER, $params['refer'] ); //это тот адрес, с которого обратился к странице пользователь
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); //Для https - отключение проверки сертификата
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0); //Для https - отключение проверки общего имени в сертификате SSL
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); //Следовать редиректам
         curl_setopt($ch, CURLOPT_MAXREDIRS, 1); //Максимальное количество редиректов
         curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1); //TRUE для принудительного использования нового соединения вместо закэшированного.
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3); //Количество секунд ожидания при попытке соединения. Используйте 0 для бесконечного ожидания.
+        if (!empty($params['timeout'])) curl_setopt($ch, CURLOPT_TIMEOUT,intval($params['timeout'])); //Максимально позволенное количество секунд для выполнения cURL-функций.	
 
-        if (isset($params['header']) && is_array($params['header'])) curl_setopt($ch, CURLOPT_HEADER, $params['header']); //Массив того, что пойдет в хедере типа array('Sign: 123', 'Key: dssdsd',...)
+        if (isset($params['header']) && is_array($params['header'])) curl_setopt($ch, CURLOPT_HEADER, $params['header']); //Массив того, что пойдет в хедере типа array('Sign: 123', 'Key: dssdsd',...) Возможно CURLOPT_HTTPHEADER
         else curl_setopt($ch, CURLOPT_HEADER, false);
         if (!empty($params['header_out'])) curl_setopt($ch, CURLINFO_HEADER_OUT, 1); //TRUE для отслеживания строки запроса дескриптора !!!Посмотреть что это!
 
