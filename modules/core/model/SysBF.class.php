@@ -52,7 +52,8 @@ class SysBF {
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3); //Количество секунд ожидания при попытке соединения. Используйте 0 для бесконечного ожидания.
         if (!empty($params['timeout'])) curl_setopt($ch, CURLOPT_TIMEOUT,intval($params['timeout'])); //Максимально позволенное количество секунд для выполнения cURL-функций.	
 
-        if (isset($params['header']) && is_array($params['header'])) curl_setopt($ch, CURLOPT_HEADER, $params['header']); //Массив того, что пойдет в хедере типа array('Sign: 123', 'Key: dssdsd',...) Возможно CURLOPT_HTTPHEADER
+        if (isset($params['header']) && is_array($params['header'])) curl_setopt($ch, CURLOPT_HTTPHEADER, $params['header']); //Массив того, что пойдет в хедере типа array('Sign: 123', 'Key: dssdsd',...)
+        if (isset($params['printheader'])) curl_setopt($ch, CURLOPT_HEADER, true); //True для вывода хедера вместе с контентом
         else curl_setopt($ch, CURLOPT_HEADER, false);
         if (!empty($params['header_out'])) curl_setopt($ch, CURLINFO_HEADER_OUT, 1); //TRUE для отслеживания строки запроса дескриптора !!!Посмотреть что это!
 
@@ -77,7 +78,7 @@ class SysBF {
      * @param type $lenght - если задано и больше 0, то количество символов в результате
      * @return string - результат операции
      */
-    public static function checkStr($str,$type="",$lenght=0){
+    public static function checkStr($str, $type="", $lenght=0){
 
         if ($str === null) return null; //Пустые значения транслируем насквозь
 
