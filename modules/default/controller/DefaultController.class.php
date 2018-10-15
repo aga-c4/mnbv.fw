@@ -178,8 +178,14 @@ json - to view result in json format
 
 
         //Тест для MySQL Memmory
+        SysStorage::$db['testmem'] = array(
+            'db' => 'mysql1', //База данных
+            'table' => 'testmem', //Таблица
+            'access' => 0, // Доступ на чтение
+            'access2' => 0 // Доступ на редактирование
+        );
         $page_content .= "MySQL Memmory:\n";
-        $myDb = SysStorage::getLink('testmem');
+        $myDb = c::getLink('testmem');
 
         //INSERT
         $testtime = microtime(true);
