@@ -383,7 +383,7 @@ class SysBF {
      * @return string
      */
     public static function wtu($str){
-        return iconv("CP1251", "UTF-8//IGNORE", $str);
+        return iconv("CP1251", "UTF-8", $str);
     }
 
     /**
@@ -392,7 +392,7 @@ class SysBF {
      * @return string
      */
     public static function utw($str){
-        return iconv("UTF-8","CP1251//IGNORE", $str);
+        return iconv("UTF-8","CP1251", $str);
     }
 
     /**
