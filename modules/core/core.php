@@ -18,7 +18,7 @@ define("APP_MODULESPATH" , 'modules/'); //Путь к директории с м
 /**
  * Путь к директории с пользовательскими модулями системы
  */
-define("USER_MODULESPATH",'user/modules/');
+define("USER_MODULESPATH",'app/modules/');
 
 //Загрузка дефолтовых и пользовательских констант и конфигов. Конфиги работают по принципу замещения.
 if(file_exists(USER_MODULESPATH . 'core/config/constants.php')) require_once (USER_MODULESPATH . 'core/config/constants.php');
