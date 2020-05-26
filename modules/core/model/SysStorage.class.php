@@ -121,10 +121,10 @@ class SysStorage {
     public static $storage = array(
         'main' => array( //Реестр хранилиш
             'db' => 'mysql1', //База данных
-            'table' => 'test', //Таблица
+            'table' => 'page', //Таблица
             'access' => 0, // Доступ на чтение
             'access2' => 0, // Доступ на редактирование
-        )
+        ),
     );
 
     /**
