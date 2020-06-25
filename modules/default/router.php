@@ -15,4 +15,4 @@ if (!empty(Glob::$vars['request']['action'])) Glob::$vars['action'] = Glob::$var
 $controller = Glob::$vars['controller'];
 $action = Glob::$vars['action'];
 
-SysLogs::addLog('Core router: Module=['.Glob::$vars['module'].'] Controller=['.$controller.'] Action=['.$action.']');
+SysLogs::addLog('Default router: Module=['.Glob::$vars['module'].'] Controller=['.$controller.'] Action=['.$action.']');
