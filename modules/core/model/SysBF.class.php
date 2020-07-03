@@ -317,7 +317,7 @@ class SysBF {
      * @return bool - результат операции
      */
     public static function saveFile($filename='',$fileTxt='',$mode='w'){
-	    if ($filename == '') return false;
+	if ($filename == '') return false;
         if ($handle = @fopen($filename,$mode)){
             if (fwrite($handle,$fileTxt)){
                 fclose($handle);
@@ -427,11 +427,12 @@ class SysBF {
     
     
     /**
-     *
-     * @param $filename
+     * Формирует строку типа файла для заголовка html
+     * @param string $filename
+     * @param array $mimeArr если задан массив, то из него берутся подстановки в порядке приоритета
      * @return mixed|string
      */
-    public static function mime_content_type($filename) {
+    public static function mime_content_type($filename, $mimeArr='') {
 
         $mime_types = array(
 
@@ -492,7 +493,14 @@ class SysBF {
             'odt' => 'application/vnd.oasis.opendocument.text',
             'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
         );
-        $filenameArr = explode('.',$filename);
+        
+        if (is_array($mimeArr)) {
+            foreach ($mimeArr as $key => $value) {
+                $mime_types[$key] = $value;
+            }
+        }
+        
+        $filenameArr = explode('.', $filename);
         $ext = strtolower(array_pop($filenameArr));
         if (array_key_exists($ext, $mime_types)) {
             return $mime_types[$ext];
