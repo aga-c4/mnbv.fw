@@ -99,12 +99,14 @@ class SysLogs {
      * @param string $viewMem если 'mem' - показывать текущие данные по памяти
      */
     public static function addError($errorMessage,$viewMem=""){
+        $viewMemStr = ($viewMem==='mem')?" [MemUse: $memory_usage Mb][MemMaxUse: $memory_max_usage Mb]":'';
         $dopStr = ((self::$logViewTime)?(date("Y-m-d G:i:s").'   '):'') . ((self::$logViewController && !empty(Glob::$vars['controller']))?(Glob::$vars['controller']. '   '):'');
+        $errorMessage = $dopStr . $errorMessage . $viewMemStr;
         if (strlen(self::$log)>100000 || strlen(self::$errors)>100000) self::clearOutErrLog();
-        if (self::$errorsEnable) self::$errors .= $dopStr . $errorMessage . "\n";
-        if (self::$logsEnable) self::$log .= $dopStr . $errorMessage . "\n";
-        if (self::$logRTView) echo $dopStr . $errorMessage . "\n"; //При необходимости тут же выводим
-        if (self::$logRTSave) self::addToLogFile($dopStr.$errorMessage, $viewMem);
+        if (self::$errorsEnable) self::$errors .= $errorMessage . "\n";
+        if (self::$logRTView) echo $errorMessage . "\n"; //При необходимости тут же выводим
+        if (self::$logRTSave) self::addToLogFile($errorMessage, $viewMem);
+        if (self::$logsEnable) self::$log .= $errorMessage . "\n";  
     }
 	
     /**
@@ -113,29 +115,30 @@ class SysLogs {
      * @param string $viewMem если 'mem' - показывать текущие данные по памяти
      */
     public static function addLog($logMessage,$viewMem=""){
+        $viewMemStr = ($viewMem==='mem')?" [MemUse: $memory_usage Mb][MemMaxUse: $memory_max_usage Mb]":'';
         $dopStr = ((self::$logViewTime)?(date("Y-m-d G:i:s").'   '):'') . ((self::$logViewController && !empty(Glob::$vars['controller']))?(Glob::$vars['controller']. '   '):'');
+        $logMessage = $dopStr . $logMessage . $viewMemStr;
         if (strlen(self::$log)>100000) self::clearOutLog();
-        if (self::$logsEnable) self::$log .= $dopStr . $logMessage . "\n";
-        if (self::$logRTView && self::$logView) echo $dopStr . $logMessage . "\n"; //При необходимости тут же выводим
-        if (self::$logRTSave) self::addToLogFile($dopStr.$logMessage, $viewMem);
+        if (self::$logRTSave) self::addToLogFile($logMessage);
+        if (self::$logRTView && self::$logView) echo $logMessage . "\n"; //При необходимости тут же выводим
+        if (self::$logsEnable) self::$log .= $logMessage . "\n";
     }
     
     /**
      * Добавляет запись в лог файл
      * @param string $logStr Строка лога
-     * @param string $viewMem если 'mem' - показывать текущие данные по памяти
      * @return bool
      */
-    public static function addToLogFile($logStr='',$viewMem=""){
+    public static function addToLogFile($logStr=''){
         $logFileSave = APP_LOGSPATH.'Syslog'.date("Y-m-d-G-i-s").'.txt';
         if (self::$logFile) $logFileSave = self::$logFile;
 
-        $memory_max_usage = number_format((memory_get_peak_usage() / (1024 * 1024)), 3);
-        $memory_usage = number_format((memory_get_usage() / (1024 * 1024)), 3);
-        
-        if (self::$logRTSaveFirst) {$mode = "w"; self::$logRTSaveFirst = false;}
-        else $mode = "a";
-        $res=SysBF::saveFile($logFileSave, $logStr.(($viewMem==='mem')?" [MemUse: $memory_usage Mb][MemMaxUse: $memory_max_usage Mb]":'')."\n", $mode);
+        if (self::$logRTSaveFirst) {//При первой записи в режиме реалтайма закинем в файл все что уже накопилось
+            self::$logRTSaveFirst = false;
+            $res=SysBF::saveFile($logFileSave, self::$log, "w");
+        }
+
+        $res=SysBF::saveFile($logFileSave, $logStr."\n", "a");
         if ($res){return true;}
         else {return false;}
     }
