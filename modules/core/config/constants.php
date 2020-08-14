@@ -271,7 +271,7 @@ if (!defined("WWW_DUMPPATH"))
 /**
  * Путь к директории tmp
  */
-define("WWW_DUMPPATH",'/tmp/');
+define("WWW_DUMPPATH",'tmp/');
 
 if (!defined("MNBV_WWW_DATAPATH")) 
 /**

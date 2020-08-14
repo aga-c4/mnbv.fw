@@ -64,6 +64,11 @@ class SysLogs {
     public static $logSave = false;
 
     /**
+     * @var boolean Создавать бак файл прежней версии лога
+     */
+    public static $logBakCreate = false;
+
+    /**
      * @var type полное имя файла лога, куда будет писаться лог, если это задано. устанавливается и создается командой self::setLogFile($filename)
      */
     public static $logFile = '';
@@ -135,6 +140,7 @@ class SysLogs {
 
         if (self::$logRTSaveFirst) {//При первой записи в режиме реалтайма закинем в файл все что уже накопилось
             self::$logRTSaveFirst = false;
+            if (self::$logBakCreate) SysBF::createBakFile($logFileSave);
             $res=SysBF::saveFile($logFileSave, self::$log, "w");
         }
 
@@ -191,6 +197,7 @@ class SysLogs {
             if (self::$logView && self::getLog()!=''){$logTxt .= "LOG:\n" . self::getLog() . "-------\n\n";}
 
             //Сохраним лог на диске
+            if (self::$logBakCreate) SysBF::createBakFile($logFileSave);
             SysBF::saveFile($logFileSave,$logTxt);
             
         }
