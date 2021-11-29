@@ -115,7 +115,7 @@ class DbMysql {
                 self::$instance["$dbName"]->query("SET NAMES " . mb_strtoupper($charset));
                 self::$instance["$dbName"]->query("SET CHARACTER SET " . mb_strtoupper($charset));
                 self::$instance["$dbName"]->query("SET COLLATION_CONNECTION='" . mb_strtoupper($collation) . "'");
-                mysqli_set_charset(self::$instance["$dbName"]->linkDb, "utf8");
+                mysqli_set_charset(self::$instance["$dbName"]->linkDb, $charset);
 
                 SysLogs::addLog('Mysql: Connect to server ' .$host . ":" . $port . ' success! Database: '.$database.'. ['.$charset.'/'.$collation.'] [' .  sprintf ("%01.6f",(microtime(true)-$timebefore)) . 's]');
             }catch (Exception $e) {
@@ -353,6 +353,31 @@ class DbMysql {
             return false;
         }
     }
+    
+    /**
+     * Возвращает экратированную строку
+     * @return string
+     */
+    public function mysql_real_escape_string($str) {
+        if (!is_string($str)) return $str;
+        $res = $str;
+        try{
+            if ($this->linkDb) return @$this->linkDb->real_escape_string($str);
+            return false;
+        }catch (Exception $e) {
+            SysLogs::addError('Mysql:Error - ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Возвращает экратированную строку алиас mysql_real_escape_string
+     * @return string
+     */
+    public function real_escape_string($str) {
+        return mysql_real_escape_string($str);
+    }
+
 
     /**
      * Проверяет соединение с сервером. Если оно утеряно, автоматически предпринимается попытка пересоединения.
