@@ -115,7 +115,7 @@ class DbMysql {
                 self::$instance["$dbName"]->query("SET NAMES " . mb_strtoupper($charset));
                 self::$instance["$dbName"]->query("SET CHARACTER SET " . mb_strtoupper($charset));
                 self::$instance["$dbName"]->query("SET COLLATION_CONNECTION='" . mb_strtoupper($collation) . "'");
-                mysqli_set_charset(self::$instance["$dbName"]->linkDb, $charset);
+                mysqli_set_charset(self::$instance["$dbName"]->linkDb, "utf8");
 
                 SysLogs::addLog('Mysql: Connect to server ' .$host . ":" . $port . ' success! Database: '.$database.'. ['.$charset.'/'.$collation.'] [' .  sprintf ("%01.6f",(microtime(true)-$timebefore)) . 's]');
             }catch (Exception $e) {
