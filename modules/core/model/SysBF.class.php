@@ -190,16 +190,19 @@ class SysBF {
      * @param string $key ключ
      * @param string $defval дефолтовое значение
      * @param string $update варианты модификации результата (intval|floatval|strval|trim|strtolower|)
+     * @param bool $nullUpd преобразоывывать null (true по-умолчанию)
      * @return mixed Значение
      */
-    public static function getFrArr($arr,$key,$defval=null,$update=''){
+    public static function getFrArr($arr,$key,$defval=null,$update='',$nullUpd=true){
 
         if (!is_array($arr)) $result = $defval;
         elseif (!isset($arr[$key])) $result = $defval;
         else $result = $arr[$key];
+        
+        if ($nullUpd!==true && $result===null) return $result;
 
-            if ($update==='intval') $result = intval($result);
-        elseif ($update==='floatval') $result = floatval($result);
+            if ($update==='intval' || $update==='int') $result = intval($result);
+        elseif ($update==='floatval' || $update==='float') $result = floatval($result);
         elseif ($update==='strval') $result = strval($result);
         elseif ($update==='trim') $result = trim($result);
         elseif ($update==='strtolower') $result = strtolower($result);
@@ -310,15 +313,159 @@ class SysBF {
     }
     
     /**
+     * Преобразует похожие по звукам буквы
+     * @param type $str
+     * @return type
+     */
+    public static function normUpdate($str){
+
+        $converter = array(
+            "dzh" => "j",
+            "cel" => "sel",
+            "cem" => "sem",
+            "csh" => "sh",
+            "sch" => "sh",
+            //"aie" => "aе",
+            "ch" => "sh",
+            "zh" => "g",
+            "ck" => "k",
+            "ph" => "f",
+            "ee" => "i",
+            //"ai" => "i",
+            "ie" => "i",
+            "ia" => "a",
+            "kh" => "h",
+            "kk" => "k",
+            "ie" => "i",
+            "yu" => "u",
+            "oo" => "u",
+            "ou" => "u",
+            "ll" => "l",
+            "pp" => "p",
+            "ss" => "s",
+            "ie" => "i",
+            "ss" => "s",
+            "gg" => "g",
+            "au" => "a",
+            "ts" => "s",
+            "ff" => "f",
+            "ee" => "e",
+            "nn" => "n",
+            "bb" => "b",
+            "eu" => "ev",
+            "ae" => "ai",
+            "je" => "i",
+            "tt" => "t",
+            "th" => "t",
+            "rr" => "r",
+            "wh" => "v",
+        );
+        $str = strtr($str, $converter);
+        
+        $converter = array(
+            "c" => "k",
+            "q" => "k",
+            "w" => "v",
+            "z" => "s",
+            "x" => "ks",
+            "e" => "i",
+            "y" => "i",
+        );
+        return strtr($str, $converter);
+    }
+    
+    /**
      * Преобразование строки транслита - очистка лишних символов (нормализация)
      * @param $str
+     * @param string если $nozpt='zpt_ok' зяпятая остается, если 'space_ok' - пробелы остаются
      * @return mixed|string
      */
-    public static function updTranslitStr($str) {
+    public static function updTranslitStr($str, $nozpt='') {
         $str = self::rus2translit($str);
         $str = strtolower($str);
-        $str = preg_replace('~[^-a-z0-9_]+~u', '_', $str);
+        $str = preg_replace('~[^-a-z0-9_, ]+~u', '_', $str);
+        $str=preg_replace("/ ( )+/u"," ",$str);
+        if ($nozpt!=='zpt_ok') $str = preg_replace("/,/u",'',$str);
+        if ($nozpt!=='space_ok') $str = preg_replace('/ /u','',$str);
         return  trim($str, "_");
+    }
+    
+    /**
+    * Проводит нормализацию строки
+    * @param string $str
+    * @param string если $nozpt='zpt_ok' зяпятая остается, если 'space_ok' - пробелы остаются
+    * @return int
+    */
+    public static function strNormalize($str, $nozpt=''){
+        $result = $str;
+        $result = SysBf::updTranslitStr($result, $nozpt);
+        $result = preg_replace('/_/','',$result);
+        $result = preg_replace('/-/','',$result);
+        return $result;
+    }
+    
+    public static function prepareSearchStr($str){
+        $res = $str;
+        
+        $search  = array(
+            '/<[^>]*>/',
+            '/</',
+            '/>/',
+            '/%/',
+            '/&/',
+            '/&/',
+            '/ ( )+/u'
+        );
+        
+        $res=preg_replace($search," ",$res);
+        
+        $search  = array(
+            '/\s+/',
+            
+            '/(\d+) kg$/',
+            '/(\d+) kg /',
+            '/(\d+) kg\./',
+            '/(\d+) кг$/',
+            '/(\d+) кг /',
+            '/(\d+) кг\./',
+            
+            '/(\d+) g$/',
+            '/(\d+) g /',
+            '/(\d+) g\./',
+            '/(\d+) гр$/',
+            '/(\d+) гр /',
+            '/(\d+) гр\./',
+            '/(\d+) гр$/',
+            '/(\d+) гр /',
+            '/(\d+) гр\./',
+            
+            '/(\d+) sm$/',
+            '/(\d+) sm /',
+            '/(\d+) sm\./',
+            '/(\d+) см$/',
+            '/(\d+) см /',
+            '/(\d+) см\./',
+            
+            '/(\d+) m$/',
+            '/(\d+) m /',
+            '/(\d+) m\./',
+            '/(\d+) м$/',
+            '/(\d+) м /',
+            '/(\d+) м\./'
+            
+        );
+        $replace = array( //Обращаем внимание на пробел в конце, НЕ нужен только если выражение в конце стрки
+            ' ',
+            '$1кг','$1кг ','$1кг ', '$1кг','$1кг ','$1кг ',
+            '$1г','$1г ','$1г ', '$1г','$1г ','$1г ','$1г','$1г ','$1г ',
+            '$1см','$1см ','$1см ','$1см','$1см ','$1см ',
+            '$1м','$1м ','$1м ','$1м','$1м ','$1м '
+        );
+
+        $res=preg_replace($search,$replace,$res);
+        
+        $res=trim($res);
+        return $res;
     }
     
     /**
