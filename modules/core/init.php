@@ -20,10 +20,11 @@ if (isset ($systemLogBakCreate)) SysLogs::$logBakCreate = ($systemLogBakCreate)?
 if (isset ($systemErrorsView)) SysLogs::$errorsView = ($systemErrorsView)?true:false; //Видимость Ошибок работы скрипта
 
 /*
+ * Function get_magic_quotes_gpc() is deprecated!!!
  * Обработка входных параметров.
  * Внимание! Существует директива magic_quotes_sybase. Она вместо слеша добавляет кавычку и ОТМЕНЯЕТ действие magic_quotes_gpc.
  * Если она у вас установлена, тогда доработайте схему преобразования входных данных
- */
+ * /
 if (get_magic_quotes_gpc()) { 
   SysBF::stripsl($_GET);
   SysBF::stripsl($_POST);
@@ -33,6 +34,7 @@ if (get_magic_quotes_gpc()) {
   if (isset($_SERVER['PHP_AUTH_PW']))   SysBF::stripsl($_SERVER['PHP_AUTH_PW']);  
   //if (isset($argv) && is_array($argv)) SysBF::stripsl($argv);  TODO - проверить вдальнейшем и при необходимости раскомментировать
 }
+*/
 
 //Разместим параметры запроса в глобальный массив Glob::$vars['request']
 SysBF::getRequest((isset($startFromConsole)&&$startFromConsole)?$startFromConsole:false);
